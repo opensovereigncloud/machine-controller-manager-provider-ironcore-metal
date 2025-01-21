@@ -77,6 +77,8 @@ func (d *metalDriver) applyServerClaim(ctx context.Context, req *driver.CreateMa
 		return nil, status.Error(codes.Internal, fmt.Sprintf("failed to create ignition file for machine %s: %v", req.Machine.Name, err))
 	}
 
+	d.clientProvider.Lock()
+	defer d.clientProvider.Unlock()
 	ignitionData := map[string][]byte{}
 	ignitionData["ignition"] = []byte(ignitionContent)
 	ignitionSecret := &corev1.Secret{
@@ -86,7 +88,7 @@ func (d *metalDriver) applyServerClaim(ctx context.Context, req *driver.CreateMa
 		},
 		ObjectMeta: metav1.ObjectMeta{
 			Name:      d.getIgnitionNameForMachine(ctx, req.Machine.Name),
-			Namespace: d.metalNamespace,
+			Namespace: d.clientProvider.Namespace,
 		},
 		Data: ignitionData,
 	}
@@ -98,7 +100,7 @@ func (d *metalDriver) applyServerClaim(ctx context.Context, req *driver.CreateMa
 		},
 		ObjectMeta: metav1.ObjectMeta{
 			Name:      req.Machine.Name,
-			Namespace: d.metalNamespace,
+			Namespace: d.clientProvider.Namespace,
 			Labels:    providerSpec.Labels,
 		},
 		Spec: metalv1alpha1.ServerClaimSpec{
@@ -112,8 +114,6 @@ func (d *metalDriver) applyServerClaim(ctx context.Context, req *driver.CreateMa
 		},
 	}
 
-	d.clientProvider.Lock()
-	defer d.clientProvider.Unlock()
 	metalClient := d.clientProvider.Client
 
 	if err := metalClient.Patch(ctx, serverClaim, client.Apply, fieldOwner, client.ForceOwnership); err != nil {
