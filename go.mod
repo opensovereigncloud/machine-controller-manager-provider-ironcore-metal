@@ -12,7 +12,7 @@ require (
 	github.com/ironcore-dev/controller-utils v0.9.4
 	github.com/ironcore-dev/ipam v0.2.3-0.20241224180207-ced9fe647b76
 	github.com/ironcore-dev/metal-operator v0.0.0-20240710090642-501a0daa1610
-	github.com/onsi/ginkgo/v2 v2.22.1
+	github.com/onsi/ginkgo/v2 v2.22.2
 	github.com/onsi/gomega v1.36.2
 	github.com/spf13/pflag v1.0.6-0.20210604193023-d5e0c0615ace
 	k8s.io/api v0.32.0
