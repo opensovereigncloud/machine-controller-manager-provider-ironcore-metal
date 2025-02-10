@@ -117,11 +117,13 @@ func (d *metalDriver) applyIPAddresses(ctx context.Context, req *driver.CreateMa
 			time.Millisecond*340,
 			true,
 			func(ctx context.Context) (bool, error) {
-				ipAddr.Status.State, err = ipamv1alpha1.CFinishedIPState, nil
-				if err != nil {
-					return false, nil
+				if err := d.metalClient.Get(ctx, ipAddrKey, ipAddr); err != nil {
+					return false, err
 				}
-				return true, nil
+				if ipAddr.Status.State == ipamv1alpha1.CFinishedIPState {
+					return true, nil
+				}
+				return false, nil
 			})
 		if err != nil {
 			return nil, fmt.Errorf("failed to wait for for ip to be finished: %w", err)
