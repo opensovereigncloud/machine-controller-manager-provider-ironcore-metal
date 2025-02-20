@@ -206,7 +206,9 @@ func (d *metalDriver) applyCapiIPAddress(ctx context.Context, networkRef apiv1al
 	}
 	return map[string]any{
 		networkRef.MetadataKey: map[string]any{
-			"ip": ipAddr.Spec.Address,
+			"ip":      ipAddr.Spec.Address,
+			"prefix":  ipAddr.Spec.Prefix,
+			"gateway": ipAddr.Spec.Gateway,
 		},
 	}, nil
 }
